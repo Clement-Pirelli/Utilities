@@ -19,6 +19,6 @@ Unless specified otherwise, this code is provided under the [NMHL license](https
 * `RenderToWindow` : Barebones class to render a bitmap to a window using the Windows API. Has a dependency to `Logger`, though again it can be removed easily.
 * `vec3` : 3D vector of floats, can be indexed with rgb, xyz, or array notation
 * `BMPWriter` : Static class which writes rgba BMPs to a specified file
-* `Delegate` : Delegate class based on the (impossibly fast delegate)[https://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates]
+* `Delegate` : Delegate class based on the [impossibly fast delegate](https://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates)
 * `Optional`: Barebones optional type with no operator overloading (std::optional<bool>, I'm looking at you). Essentially amounts to nothing but a wrapper with a bool.
 * `RadixSort` : Radix sort implementation I wrote a long time ago. Not too sure about the quality of it, but perhaps it's useful to someone
