@@ -1,15 +1,15 @@
-#ifndef RENDER_TO_SCREEN_H_DEFINED
-#define RENDER_TO_SCREEN_H_DEFINED
+#ifndef RENDER_TO_WINDOW_H_DEFINED
+#define RENDER_TO_WINDOW_H_DEFINED
 
 union color;
 struct RenderTarget;
 
 
-class RenderToScreen
+class RenderToWindow
 {
 public:
-	RenderToScreen(color *image, size_t width, size_t height);
-	~RenderToScreen();
+	RenderToWindow(color *image, size_t width, size_t height);
+	~RenderToWindow();
 
 	void handleMessagesBlocking();
 	void updateImage(color *image);

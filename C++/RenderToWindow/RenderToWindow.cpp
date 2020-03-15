@@ -97,7 +97,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-RenderToScreen::RenderToScreen(color *image, size_t width, size_t height) : width(width), height(height), rt(nullptr)
+RenderToWindow::RenderToWindow(color *image, size_t width, size_t height) : width(width), height(height), rt(nullptr)
 {
 	const wchar_t *const myclass = L"minimalWindowClass";
 
@@ -141,12 +141,12 @@ RenderToScreen::RenderToScreen(color *image, size_t width, size_t height) : widt
 	}
 }
 
-RenderToScreen::~RenderToScreen()
+RenderToWindow::~RenderToWindow()
 {
 	delete rt;
 }
 
-void RenderToScreen::handleMessagesBlocking()
+void RenderToWindow::handleMessagesBlocking()
 {
 	MSG msg;
 	while(GetMessage(&msg, 0, 0, 0))
@@ -158,7 +158,7 @@ void RenderToScreen::handleMessagesBlocking()
 	}
 }
 
-void RenderToScreen::updateImage(color *image)
+void RenderToWindow::updateImage(color *image)
 {
 	if (rt == nullptr) return;
 
