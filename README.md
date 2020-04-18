@@ -22,3 +22,4 @@ Unless specified otherwise, this code is provided under the [NMHL license](https
 * `Delegate` : Delegate class based on the [impossibly fast delegate](https://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates)
 * `Optional`: Barebones optional type with no operator overloading (std::optional<bool>, I'm looking at you). Essentially amounts to nothing but a wrapper with a bool.
 * `RadixSort` : Radix sort implementation I wrote a long time ago. Not too sure about the quality of it, but perhaps it's useful to someone
+* `Serializer` : Serialization classes
