@@ -2,16 +2,6 @@
 #include <cstdint>
 #include <cassert>
 
-template <typename T> 
-class UnownedPtr {
-public:
-	UnownedPtr(T *t):value(t){}
-	UnownedPtr(const UnownedPtr &other) = default;
-	inline T *get() noexcept { return value; }
-private:
-	T *value = nullptr;
-};
-
 template<class T>
 class Serializer{
 public:
@@ -81,9 +71,9 @@ public:
 		memcpy(address, items, sizeof(T)*amount);
 	}
 
-	UnownedPtr<uint8_t> getData() 
+	uint8_t *getData() 
 	{
-		return UnownedPtr<uint8_t>(data);
+		return data;
 	}
 
 private:
