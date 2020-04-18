@@ -60,6 +60,7 @@ public:
 	{
 		uint8_t *address = data + at;
 		at += sizeof(T);
+		assert(at <= maxSize);
 		memcpy(address, &item, sizeof(T));
 	}
 
@@ -68,6 +69,7 @@ public:
 	{
 		uint8_t *address = data + at;
 		at += sizeof(T)*amount;
+		assert(at <= maxSize);
 		memcpy(address, items, sizeof(T)*amount);
 	}
 
