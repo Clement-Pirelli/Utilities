@@ -7,8 +7,7 @@ public class LocalizationPicker : MonoBehaviour
 {
     public static string localizationPrefKey = "PickedLocalization";
     [SerializeField] GameObject[] buttons = null;
-
-    [SerializeField] SceneSwitcher switcher = null;
+    
     public enum LANGUAGE
     {
         ENGLISH = 1,
@@ -53,24 +52,5 @@ public class LocalizationPicker : MonoBehaviour
                 LocalizationManager.LoadLocalisedText("localization_swedish.json");
                 break;
         }
-        
-        //start waiting for loading to be done
-        StartCoroutine(OnLocalizationload());
-    }
-
-    IEnumerator OnLocalizationload()
-    {
-        //wait for the localization manager to have loaded the data
-        while (!LocalizationManager.Ready)
-        {
-            yield return null;
-        }
-        //load the main menu : we're done
-        LoadMainMenu();
-    }
-
-    void LoadMainMenu()
-    {
-        switcher.SceneChange("MainMenu", transition ? SceneSwitcher.SCENE_SWITCH_TYPE.TRANSITION : SceneSwitcher.SCENE_SWITCH_TYPE.INSTANT);
     }
 }
