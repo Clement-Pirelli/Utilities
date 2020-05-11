@@ -6,19 +6,6 @@ using System.IO;
 
 public class LocalizationEditor : EditorWindow
 {
-    
-    static string LastPath { 
-        get 
-        {
-            var p = PlayerPrefs.GetString("lastPath");
-            return p == "" ? Application.streamingAssetsPath : p; 
-        } 
-        set 
-        {
-            PlayerPrefs.SetString("lastPath", value);
-        } 
-    }
-
     string filePath = null;
     string filter = "";
 
@@ -30,101 +17,24 @@ public class LocalizationEditor : EditorWindow
 
     Vector2 scrollView;
 
-
-    #region Menu items
-
-    [MenuItem("Localization Editor/Merge")]
-    static void MergeFiles() {
-        LocalizationData data1, data2;
-
-        string path = GetFilePathFromUser("Select first localisation data file");
-        
-        if (!string.IsNullOrEmpty(path))
-        {
-            string jsonData = File.ReadAllText(path);
-            data1 = JsonUtility.FromJson<LocalizationData>(jsonData);
-            LastPath = path;
-        }
-        else { return; }
-
-        if(data1 == null || data1.keyValuePairs == null || data1.keyValuePairs.Count == 0) 
-        {
-            OnError("Couldn't read data from provided file! Please provide a valid file");
-        }
-
-        string path2 = GetFilePathFromUser("Select second localisation data file");
-
-        if (!string.IsNullOrEmpty(path))
-        {
-            string jsonData = File.ReadAllText(path);
-            data2 = JsonUtility.FromJson<LocalizationData>(jsonData);
-            LastPath = path2;
-        }
-        else { return; }
-
-        if (data2 == null || data2.keyValuePairs == null || data2.keyValuePairs.Count == 0)
-        {
-            OnError("Couldn't read data from provided file! Please provide a valid file");
-        }
-
-        System.Threading.Tasks.Task<bool> mergeTask = new System.Threading.Tasks.Task<bool>(
-            () =>
-            {
-                data1.keyValuePairs.ForEach((pair) =>
-                {
-                    if (!data2.keyValuePairs.Exists((p) => p.key == pair.key))
-                    {
-                        data2.keyValuePairs.Add(pair);
-                    }
-                });
-
-                data2.keyValuePairs.ForEach((pair) =>
-                {
-                    if (!data1.keyValuePairs.Exists((p) => p.key == pair.key))
-                    {
-                        data1.keyValuePairs.Add(pair);
-                    }
-                });
-
-                SaveDataToSetPath(path, data1);
-                SaveDataToSetPath(path2, data2);
-
-                return true;
-            }
-            );
-
-        mergeTask.Start();
-        float i = 0;
-        while (!mergeTask.IsCompleted) 
-        {
-            i++;
-            if (i < 100) i = 100;
-            EditorUtility.DisplayProgressBar("Merging data...", "Please stand by", i);
-        }
-
-        EditorUtility.ClearProgressBar();
-        EditorUtility.DisplayDialog("Operation successful!", "Your data has been merged successfully", "OK");
-    }
-
     [MenuItem("Localization Editor/Edit")]
-    static void StartEdit() => EditorWindow.GetWindow<LocalizationEditor>("Localization Editor").Show();
-
-    #endregion
+    static void StartEdit() => GetWindow<LocalizationEditor>("Localization Editor").Show();
 
     private void OnGUI()
     {
         HandleInput();
-        
-        if(data != null)
+
+        if (data != null)
         {
             DisplayDataFields();
-        } else 
+        }
+        else
         {
             GUILayout.Space(20.0f);
             EditorGUILayout.Separator();
         }
-        
-        if(GUILayout.Button("Load File")) LoadData();
+
+        if (GUILayout.Button("Load File")) LoadData();
         if (GUILayout.Button("New File")) NewData();
     }
 
@@ -133,7 +43,7 @@ public class LocalizationEditor : EditorWindow
         filter = EditorGUILayout.TextField("Search", filter, GUILayout.ExpandWidth(true));
 
         GUILayout.Space(20);
-        EditorGUILayout.LabelField(new GUIContent { text = "<b>Data : </b>" }, new GUIStyle { fontSize = 20, richText = true});
+        EditorGUILayout.LabelField(new GUIContent { text = "<b>Data : </b>" }, new GUIStyle { fontSize = 20, richText = true });
         GUILayout.Space(10);
 
 
@@ -146,9 +56,9 @@ public class LocalizationEditor : EditorWindow
             var keyValuePairProp = keyValuePairListProperty.GetArrayElementAtIndex(i);
             var keyProp = keyValuePairProp.FindPropertyRelative("key");
             var valueProp = keyValuePairProp.FindPropertyRelative("value");
-            if (filter == "" || keyProp.stringValue.StartsWith(filter)) 
+            if (filter == "" || keyProp.stringValue.StartsWith(filter))
             {
-                if(EditorGUILayout.PropertyField(keyValuePairProp))
+                if (EditorGUILayout.PropertyField(keyValuePairProp))
                 {
                     EditorGUI.BeginChangeCheck();
 
@@ -162,8 +72,8 @@ public class LocalizationEditor : EditorWindow
 
                 }
 
-                DrawDivider();
-                
+                LocalizationEditorUtils.DrawDivider();
+
                 GUILayout.Space(10.0f);
             }
         }
@@ -179,7 +89,7 @@ public class LocalizationEditor : EditorWindow
         EditorGUI.BeginDisabledGroup(saved);
         if (filePath != null && (GUILayout.Button("Save File") || (EditorGUI.actionKey && sPressed)))
         {
-            SaveDataToSetPath(filePath, data);
+            LocalizationEditorUtils.SaveDataToSetPath(filePath, data);
             saved = true;
             Repaint();
         }
@@ -193,13 +103,13 @@ public class LocalizationEditor : EditorWindow
     private void LoadData()
     {
         if (!SaveCheck()) return;
-        filePath = GetFilePathFromUser();
+        filePath = LocalizationEditorUtils.GetFilePathFromUser();
         if (!string.IsNullOrEmpty(filePath))
         {
             string jsonData = File.ReadAllText(filePath);
             data = JsonUtility.FromJson<LocalizationData>(jsonData);
             saved = true;
-            LastPath = filePath;
+            LocalizationEditorUtils.LastPath = filePath;
         }
     }
 
@@ -208,7 +118,7 @@ public class LocalizationEditor : EditorWindow
     private void SaveData()
     {
         //opens a save file panel and saves user-inputted path
-        filePath = GetFilePathFromUser();
+        filePath = LocalizationEditorUtils.GetFilePathFromUser();
         //if the path is valid
         if (!string.IsNullOrEmpty(filePath))
         {
@@ -217,7 +127,7 @@ public class LocalizationEditor : EditorWindow
             //write
             File.WriteAllText(filePath, jsonData);
             saved = true;
-            LastPath = filePath;
+            LocalizationEditorUtils.LastPath = filePath;
         }
 
     }
@@ -251,33 +161,178 @@ public class LocalizationEditor : EditorWindow
         return EditorUtility.DisplayDialog("Unsaved changes!", "You have unsaved changes. Are you sure you wish to proceed?", "Yea", "Nah fam");
     }
 
-    private static void SaveDataToSetPath(string path, LocalizationData data)
+
+
+    #endregion
+}
+
+class LocalizationMerger : EditorWindow
+{
+    struct MergeItem
+    {
+        public LocalizationData data;
+        public string path;
+    }
+    MergeItem first, second;
+    bool merged = false;
+
+    [MenuItem("Localization Editor/Merge")]
+    static void StartMerge() => GetWindow<LocalizationMerger>("Localization Merger").Show();
+
+    private void OnGUI()
+    {
+        DisplayMergeItem(ref first, "Select first data");
+        DisplayMergeItem(ref second, "Select second data");
+
+        LocalizationEditorUtils.DrawDivider();
+
+        bool disabled = string.IsNullOrEmpty(first.path) || string.IsNullOrEmpty(second.path);
+
+        EditorGUI.BeginDisabledGroup(disabled);
+
+        if (GUILayout.Button("Merge")) 
+        {
+            MergeFiles();
+        }
+
+        if(disabled) EditorGUI.EndDisabledGroup();
+    }
+
+    private static void DisplayMergeItem(ref MergeItem item, string message) 
+    {
+        if (!string.IsNullOrEmpty(item.path))
+        {
+            GUILayout.Label(item.path);
+        }
+
+        if (GUILayout.Button(message)) 
+        {
+            var path = LocalizationEditorUtils.GetFilePathFromUser("Select a localisation data file");
+            if (!string.IsNullOrEmpty(path))
+            {
+                string jsonData = File.ReadAllText(path);
+                item.data = JsonUtility.FromJson<LocalizationData>(jsonData);
+                LocalizationEditorUtils.LastPath = path;
+                if (LocalizationEditorUtils.IsDataInvalid(item.data))
+                {
+                    LocalizationEditorUtils.OnError("Couldn't read data from provided file! Please provide a valid file");
+                }
+                else 
+                {
+                    item.path = path;
+                    LocalizationEditorUtils.LastPath = path;
+                }
+            }
+        }
+
+        GUILayout.Space(50.0f);
+    }
+
+    void MergeFiles()
+    {
+        var firstDict = new Dictionary<string, string>();
+        var secondDict = new Dictionary<string, string>();
+
+        EditorUtility.DisplayProgressBar("Merging data...", "Please stand by", 0);
+
+        foreach (var pair in first.data.keyValuePairs)
+        {
+            if (!firstDict.ContainsKey(pair.key)) firstDict.Add(pair.key, pair.value);
+        }
+
+        foreach (var pair in second.data.keyValuePairs)
+        {
+            if (!secondDict.ContainsKey(pair.key)) secondDict.Add(pair.key, pair.value);
+        }
+
+        foreach (var key in firstDict.Keys)
+        {
+            if (!secondDict.ContainsKey(key)) secondDict.Add(key, firstDict[key]);
+        }
+
+        EditorUtility.DisplayProgressBar("Merging data...", "Please stand by", 50);
+
+        foreach (var key in secondDict.Keys)
+        {
+            if (!firstDict.ContainsKey(key)) firstDict.Add(key, secondDict[key]);
+        }
+
+        EditorUtility.DisplayProgressBar("Merging data...", "Please stand by", 100);
+
+        first.data.keyValuePairs.Clear();
+        second.data.keyValuePairs.Clear();
+
+        foreach (var key in firstDict.Keys)
+        {
+            var a = new KeyValuePair();
+            a.key = key;
+            a.value = firstDict[key];
+            first.data.keyValuePairs.Add(a);
+        }
+
+        LocalizationEditorUtils.SaveDataToSetPath(first.path, first.data);
+
+        foreach (var key in secondDict.Keys)
+        {
+            var a = new KeyValuePair();
+            a.key = key;
+            a.value = secondDict[key];
+            second.data.keyValuePairs.Add(a);
+        }
+
+        LocalizationEditorUtils.SaveDataToSetPath(second.path, second.data);
+
+        EditorUtility.ClearProgressBar();
+        EditorUtility.DisplayDialog("Operation successful!", "Your data has been merged successfully", "OK");
+    }
+}
+
+
+
+
+
+class LocalizationEditorUtils
+{
+    public static string LastPath
+    {
+        get
+        {
+            var p = PlayerPrefs.GetString("lastPath");
+            return p == "" ? Application.streamingAssetsPath : p;
+        }
+        set
+        {
+            PlayerPrefs.SetString("lastPath", value);
+        }
+    }
+
+    public static void SaveDataToSetPath(string path, LocalizationData data)
     {
         //serialize pairs
-        string jsonData = JsonUtility.ToJson(data);
+        string jsonData = JsonUtility.ToJson(data, true);
         //write
         File.WriteAllText(path, jsonData);
     }
-    private static string GetFilePathFromUser(string message = "Select localisation data file")
+    public static string GetFilePathFromUser(string message = "Select localisation data file")
     {
         return EditorUtility.OpenFilePanel(message, LastPath, "json");
     }
 
-    private static void OnError(string errorMessage)
+    public static void OnError(string errorMessage)
     {
         EditorUtility.DisplayDialog(errorMessage, "", "OK");
     }
 
-    private static void DrawDivider() 
+    public static void DrawDivider()
     {
         Rect rect = EditorGUILayout.GetControlRect(false, 1);
-        EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1));
+        EditorGUI.DrawRect(rect, Color.gray);
     }
 
-    class KeyValuePairComparer : IComparer<KeyValuePair>
-    {
-        public int Compare(KeyValuePair x, KeyValuePair y) => string.Compare(x.key, y.key, System.StringComparison.CurrentCultureIgnoreCase);
-    }
+    public static bool IsDataInvalid(LocalizationData data) => (data == null || data.keyValuePairs == null || data.keyValuePairs.Count == 0);
+}
 
-    #endregion
+class KeyValuePairComparer : IComparer<KeyValuePair>
+{
+    public int Compare(KeyValuePair x, KeyValuePair y) => string.Compare(x.key, y.key, System.StringComparison.CurrentCultureIgnoreCase);
 }
