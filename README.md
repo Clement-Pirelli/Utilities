@@ -17,7 +17,8 @@ Unless specified otherwise, this code is provided under the [NMHL license](https
 * `Logger` : Static class which logs formatted and non-formatted strings to stdout
 * `RenderDocApi` : Simple class to load/communicate with the RenderDoc API
 * `RenderToWindow` : Barebones class to render a bitmap to a window using the Windows API. Has a dependency to `Logger`, though again it can be removed easily.
-* `vec3` : 3D vector of floats, can be indexed with rgb, xyz, or array notation
+* `vec` : templated vector of floats using C++20 concepts
+* `squaremat` : templated square matrix of floats using C++20 concepts
 * `BMPWriter` : Function which writes rgba BMPs to a specified file path
 * `Delegate` : Delegate class based on the [impossibly fast delegate](https://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates)
 * `Optional`: Barebones optional type with no operator overloading (std::optional<bool>, I'm looking at you). Essentially amounts to nothing but a wrapper with a bool.
