@@ -39,7 +39,7 @@ public:
 private:
 
 	template<typename T>
-	static T deserialize(uint8_t *data, size_t size) const noexcept
+	static T deserialize(uint8_t *data, size_t size) noexcept
 	{
 		assert(size >= sizeof(T));
 
