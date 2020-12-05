@@ -59,7 +59,7 @@ struct vec
 
 	constexpr vec() = default;
 
-	constexpr vec(const std::array<float, N> &elements)
+	constexpr vec(const float* elements)
 	{
 		for (size_t i = 0; i < N; i++)
 		{
@@ -92,6 +92,15 @@ struct vec
 	VEC_TO_FLOAT_OPERATOR(-);
 	VEC_TO_FLOAT_OPERATOR(/ );
 	VEC_TO_FLOAT_OPERATOR(*);
+
+	vec<N> operator-() const {
+		vec<N> result;
+		for (size_t i = 0; i < N; i++)
+		{
+			result[i] = -e[i];
+		}
+		return result;
+	}
 
 	VEC_ELEMENT_GETTER(0, x);
 	VEC_ELEMENT_GETTER(1, y);
