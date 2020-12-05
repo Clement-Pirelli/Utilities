@@ -1,4 +1,4 @@
-#include "RenderToScreen.h"
+#include "RenderToWindow.h"
 #include "Logger.h"
 #include <cstdint>
 
@@ -77,7 +77,7 @@ static LRESULT CALLBACK
 Win32DefaultProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
 	switch (message) {
 	case WM_CLOSE: { PostQuitMessage(0); } break;
-	default: { return DefWindowProcA(window, message, wparam, lparam); } break;
+	default: { return DefWindowProcW(window, message, wparam, lparam); } break;
 	}
 	return 0;
 }
