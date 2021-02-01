@@ -14,7 +14,7 @@ template<size_t N>
 struct squaremat
 {
 	squaremat() { elements = identity().elements; }
-	squaremat(const std::array<float, N*N> &arr)
+	squaremat(const std::array<float, N *N> &arr)
 	{
 		elements = arr;
 	}
@@ -26,21 +26,21 @@ struct squaremat
 	inline float operator[](size_t i) const { return elements[i]; }
 	inline float &operator[](size_t i) { return elements[i]; }
 	inline float at(size_t x, size_t y) const { return elements[x + y * N]; }
-	inline float& at(size_t x, size_t y) { return elements[x + y * N]; }
+	inline float &at(size_t x, size_t y) { return elements[x + y * N]; }
 
-	inline vec<N> columnAt(size_t x) const
+	inline vec<float, N> columnAt(size_t x) const
 	{
-		vec<N> result = {};
-		for(size_t i = 0; i < N; i++)
+		vec<float, N> result = {};
+		for (size_t i = 0; i < N; i++)
 		{
 			result[i] = at(x, i);
 		}
 		return result;
 	}
 
-	inline vec<N> rowAt(size_t y) const
+	inline vec<float, N> rowAt(size_t y) const
 	{
-		vec<N> result = {};
+		vec<float, N> result = {};
 		for (size_t i = 0; i < N; i++)
 		{
 			result[i] = at(i, y);
@@ -53,20 +53,20 @@ struct squaremat
 		squaremat<N> result = {};
 
 		for (size_t y = 0; y < N; y++)
-		for (size_t x = 0; x < N; x++)
-		{
-			result.at(x, y) = vec<N>::dot(rowAt(y), other.columnAt(x));
-		}
+			for (size_t x = 0; x < N; x++)
+			{
+				result.at(x, y) = vec<float, N>::dot(rowAt(y), other.columnAt(x));
+			}
 
 		return result;
 	}
 
-	vec<N> operator *(const vec<N> &v) const
+	vec<float, N> operator *(const vec<float, N> &v) const
 	{
-		vec<N> result = {};
-		for(size_t rowIndex = 0; rowIndex < N; rowIndex++)
+		vec<float, N> result = {};
+		for (size_t rowIndex = 0; rowIndex < N; rowIndex++)
 		{
-			for(size_t elementIndex = 0; elementIndex < N; elementIndex++)
+			for (size_t elementIndex = 0; elementIndex < N; elementIndex++)
 			{
 				result[rowIndex] += v[elementIndex] * at(elementIndex, rowIndex);
 			}
@@ -88,34 +88,34 @@ struct squaremat
 	squaremat<N> operator /(const float value) const
 	{
 		squaremat<N> result = *this;
-		for(auto &element : result.elements)
+		for (auto &element : result.elements)
 		{
 			element /= value;
 		}
 		return result;
 	}
 
-	squaremat<N> transposed() const 
+	squaremat<N> transposed() const
 	{
 		squaremat<N> copy = *this;
 
 		for (size_t y = 0; y < N; y++)
-		for (size_t x = 0; x < N; x++)
-		{
-			copy.at(x, y) = at(y, x);
-		}
+			for (size_t x = 0; x < N; x++)
+			{
+				copy.at(x, y) = at(y, x);
+			}
 
 		return copy;
 	}
 
 	constexpr static squaremat<N> identity()
 	{
-		std::array<float, N*N> resultArr = {};
+		std::array<float, N *N> resultArr = {};
 		for (size_t y = 0; y < N; y++)
-		for (size_t x = 0; x < N; x++)
-		{
-			resultArr[x + y * N] = (x == y) ? 1.0f : .0f;
-		}
+			for (size_t x = 0; x < N; x++)
+			{
+				resultArr[x + y * N] = (x == y) ? 1.0f : .0f;
+			}
 
 		return squaremat<N>(resultArr);
 	}
@@ -123,7 +123,7 @@ struct squaremat
 	static squaremat<N> rotatedX(float byRadians) requires (N >= 3)
 	{
 		return mat3x3({
-			1.0f, .0f,			 .0f,				
+			1.0f, .0f,			 .0f,
 			 .0f, cosf(byRadians), -sinf(byRadians),
 			 .0f, sinf(byRadians), cosf(byRadians)
 			}).expandTo<N>();
@@ -133,7 +133,7 @@ struct squaremat
 	{
 		return mat3x3({
 			cosf(byRadians), .0f, sinf(byRadians),
-			.0f,			1.0f, .0f,			
+			.0f,			1.0f, .0f,
 			-sinf(byRadians),.0f, cosf(byRadians)
 			}).expandTo<N>();
 	};
@@ -156,7 +156,7 @@ struct squaremat
 			.0f, .0f, .0f , 1.0f
 			});
 	};
-	
+
 	static squaremat<N> scale(const vec3 &by) requires (N >= 3)
 	{
 		return mat3x3({
@@ -190,7 +190,7 @@ struct squaremat
 		{
 			return *this;
 		}
-		else 
+		else
 		{
 			squaremat<M> result = squaremat<M>::identity();
 
@@ -204,19 +204,19 @@ struct squaremat
 		}
 	};
 
-	squaremat<N-1> calculateMinorAt(size_t row, size_t column) const requires (N >= 2)
+	squaremat<N - 1> calculateMinorAt(size_t row, size_t column) const requires (N >= 2)
 	{
 		squaremat<N - 1> minor = {};
 		for (size_t y = 0; y < N; y++)
-		for (size_t x = 0; x < N; x++) 
-		{	
-			if (x == row || y == column) continue;
+			for (size_t x = 0; x < N; x++)
+			{
+				if (x == row || y == column) continue;
 
-			bool afterRow = x > row;
-			bool afterColumn = y > column;
+				bool afterRow = x > row;
+				bool afterColumn = y > column;
 
-			minor.at(x - afterRow, y - afterColumn) = at(x, y);
-		}
+				minor.at(x - afterRow, y - afterColumn) = at(x, y);
+			}
 		return minor;
 	};
 
@@ -228,12 +228,12 @@ struct squaremat
 			for (size_t i = 0; i < N; i++) {
 				float lowerDet = calculateMinorAt(0, i).calculateDeterminant();
 				const bool adding = i % 2 == 0;
-				
+
 				result += at(0, i) * (adding ? 1.0f : -1.0f) * lowerDet;
 			}
 		}
 		else {
-			result = at(0, 0) * at(1,1) - at(0,1) * at(1, 0);
+			result = at(0, 0) * at(1, 1) - at(0, 1) * at(1, 0);
 		}
 
 		return result;
@@ -244,11 +244,11 @@ struct squaremat
 		squaremat<N> adjugate = {};
 
 		for (size_t y = 0; y < N; y++)
-		for (size_t x = 0; x < N; x++)
-		{
-			const bool positive = ((x + y) % 2) == 0;
-			adjugate.at(y, x) = (positive ? 1.0f : -1.0f) * calculateMinorAt(x, y).calculateDeterminant();
-		}
+			for (size_t x = 0; x < N; x++)
+			{
+				const bool positive = ((x + y) % 2) == 0;
+				adjugate.at(y, x) = (positive ? 1.0f : -1.0f) * calculateMinorAt(x, y).calculateDeterminant();
+			}
 
 		return adjugate;
 	}
@@ -267,21 +267,68 @@ struct squaremat
 	};
 	static mat4x4 perspective(const PerspectiveProjection &projection) requires (N == 4)
 	{
-		const float fovY = projection.fovX * projection.aspectRatio;
-		const float halfFovY = fovY * .5f;
-		const float halfFovX = projection.fovX * .5f;
+		const float halfFOV = tanf(projection.fovX * .5f);
 
 		const float m33 = -((projection.zfar + projection.znear) / (projection.zfar - projection.znear));
 		const float m43 = -(2.0f * (projection.zfar * projection.znear) / (projection.zfar - projection.znear));
 
-		return mat4x4({
-			1.0f / atanf(halfFovX), .0f, .0f, .0f,
-			.0f, 1.0f / atanf(halfFovY), .0f, .0f,
+		if (projection.aspectRatio < 1.0f)
+		{
+			return mat4x4({
+			1.0f / halfFOV, .0f, .0f, .0f,
+			.0f, 1.0f / (halfFOV / projection.aspectRatio), .0f, .0f,
 			.0f, .0f, m33, m43,
 			.0f, .0f, -1.0f, 1.0f
-			});
+				});
+		}
+		else
+		{
+			return mat4x4({
+			1.0f / (halfFOV * projection.aspectRatio), .0f, .0f, .0f,
+			.0f, 1.0f / halfFOV, .0f, .0f,
+			.0f, .0f, m33, m43,
+			.0f, .0f, -1.0f, 1.0f
+				});
+		}
 	};
 
-	
-	std::array<float, N*N> elements = {};
+	struct OrthographicProjection
+	{
+		float right, left, top, bottom, far, near;
+	};
+	static mat4x4 orthographic(const OrthographicProjection &projection) requires (N == 4)
+	{
+		const float m00 = 2.0f / (projection.right - projection.left);
+		const float m40 = -(projection.right + projection.left) / (projection.right - projection.left);
+		const float m11 = 2.0f / (projection.top - projection.bottom);
+		const float m41 = -(projection.top + projection.bottom) / (projection.top - projection.bottom);
+		const float m33 = -2.0f / (projection.far - projection.near);
+		const float m43 = -(projection.far + projection.near) / (projection.far - projection.near);
+		return mat4x4({
+			m00, .0f, .0f, m40,
+			.0f, m11, .0f, m41,
+			.0f, .0f, m33, m43,
+			.0f, .0f, .0f, 1.0f
+			});
+	}
+
+	struct LookAt
+	{
+		vec3 eye, target, up;
+	};
+	static mat4x4 lookAt(const LookAt &params) requires (N == 4)
+	{
+		const vec3 forward = (params.target - params.eye).normalized();
+		const vec3 u = vec3::cross(params.up, forward);
+		const vec3 v = vec3::cross(forward, u);
+
+		return mat4x4({
+			u.x(), u.y(), u.z(), vec3::dot(params.eye, u),
+			v.x(), v.y(), v.z(), vec3::dot(params.eye, v),
+			forward.x(), forward.y(), forward.z(), vec3::dot(params.eye, forward),
+			.0f, .0f, .0f, 1.0f
+			});
+	}
+
+	std::array<float, N *N> elements = {};
 };
