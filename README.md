@@ -12,6 +12,7 @@ Unless specified otherwise, this code is provided under the [NMHL license](https
 * `IOUtility` : Simple IO for Unity Mobile. Not asynchronous.
 * `RingBuffer` : Barebones ring buffer. Useful for object pooling.
 * `Timer` : Barebones timer
+* `ComputeUtilities` : Some utilities I wrote for Unity compute shader work. Of special interest is the `ComputeVariable` attribute, which allows the user to write `[ComputeVariable] SomeType someName;` and have their variable uploaded to a compute shader every frame. Optional parameters are available to specify which kernel, frequency of update and name should be used.
 
 ### C++
 * `Logger` : Static class which logs formatted and non-formatted strings to stdout
