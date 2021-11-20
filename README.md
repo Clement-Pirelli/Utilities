@@ -2,7 +2,7 @@
 
 This is a repository for the utility functions I have written, both for C++ and C# (Unity) applications.
 
-Unless specified otherwise, this code is provided under the [NMHL license](https://github.com/infuanfu/NMHL)
+Unless specified otherwise, this code is provided under the MIT License
 
 ## What the code does
 ### C# (Unity)
