@@ -43,9 +43,9 @@ public static class Math
 
 public static class CSUtilities
 {
-    public static RenderTexture CreateRenderTexture(int resolution, FilterMode filterMode, RenderTextureFormat format)
+    public static RenderTexture CreateRenderTexture(int resolutionx, int resolutiony, FilterMode filterMode, RenderTextureFormat format) 
     {
-        RenderTexture texture = new RenderTexture(resolution, resolution, 1, format)
+        RenderTexture texture = new RenderTexture(resolutionx, resolutiony, 1, format)
         {
             enableRandomWrite = true,
             filterMode = filterMode,
@@ -62,6 +62,11 @@ public static class CSUtilities
         texture.Create();
 
         return texture;
+    }
+
+    public static RenderTexture CreateRenderTexture(int resolution, FilterMode filterMode, RenderTextureFormat format)
+    {
+        return CreateRenderTexture(resolution, resolution, filterMode, format);
     }
 
     public static RenderTexture Create3DRenderTexture(int resolution, FilterMode filterMode, RenderTextureFormat format)

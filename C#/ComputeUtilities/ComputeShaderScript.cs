@@ -13,8 +13,15 @@ public abstract class ComputeShaderScript : MonoBehaviour
     protected Material outMaterial;
 
     [SerializeField, Range(.0f, 2.0f)]
-    float simulationSpeed = 1.0f;
+    protected float simulationSpeed = 1.0f;
     protected int steps = 0;
+
+    private Dictionary<string, int> namesToKernels = new Dictionary<string, int>();
+    protected int GetKernel(string name) 
+    {
+        int kernel;
+        return namesToKernels.TryGetValue(name, out kernel) ? kernel : computeShader.FindKernel(name);
+    }
 
     void Start()
     {
@@ -40,6 +47,7 @@ public abstract class ComputeShaderScript : MonoBehaviour
     [NaughtyAttributes.Button]
     public void Restart()
     {
+        GetKernels();
         SetupResources();
         UpdateComputeVariables(UpdateFrequency.OnStart);
         ResetState();
@@ -56,9 +64,10 @@ public abstract class ComputeShaderScript : MonoBehaviour
     private void OnEnable() => ReleaseResources();
     private void OnDisable() => ReleaseResources();
 
+
+    const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
     private void UpdateComputeVariables(UpdateFrequency frequencyToMatch) 
     {
-        const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
         foreach (var field in GetType().GetFields(bindingFlags)) 
         {
             var attributes = (ComputeVariableAttribute[]) field.GetCustomAttributes(typeof(ComputeVariableAttribute), false);
@@ -68,7 +77,7 @@ public abstract class ComputeShaderScript : MonoBehaviour
                 {
                     var value = field.GetValue(this);
                     var name = attribute.VariableName ?? field.Name;
-                    var kernel = attribute.KernelName is null ? 0 : computeShader.FindKernel(attribute.KernelName);
+                    var kernel = attribute.KernelName is null ? 0 : GetKernel(attribute.KernelName);
                     UpdateComputeVariable(value, name, kernel);
                 }
             }
@@ -77,6 +86,13 @@ public abstract class ComputeShaderScript : MonoBehaviour
 
     private void UpdateComputeVariable(object value, string name, int kernel) 
     {
+        //for enums, extract their underlying value and type
+        if (value.GetType().IsEnum)
+        {
+            Type underlying = value.GetType().GetEnumUnderlyingType();
+            value = Convert.ChangeType(value, underlying);
+        }
+
         switch (value)
         {
             case bool b:
@@ -109,9 +125,36 @@ public abstract class ComputeShaderScript : MonoBehaviour
             case ComputeBuffer cb:
                 computeShader.SetBuffer(kernel, name, cb);
                 break;
-            default:
-                Debug.LogError($"ComputeVariable of name {name} has an unsupported type! Type was {value.GetType()}");
+            case AnimationCurve am:
+                computeShader.SetFloat(name, am.Evaluate(Time.time));
                 break;
+            default:
+                Debug.LogError($"ComputeVariable of name {name} has an unsupported type! Type was {value?.GetType()}");
+                break;
+        }
+    }
+
+    private void GetKernels()
+    {
+        namesToKernels.Clear();
+
+        foreach (var field in GetType().GetFields(bindingFlags))
+        {
+            var attribute = field.GetCustomAttribute<ComputeKernelAttribute>();
+            if(attribute != null)
+            {
+                var name = attribute.NameOverride ?? field.Name;
+                var value = field.GetValue(this);
+                if (value.GetType() != typeof(int))
+                {
+                    Debug.LogError($"ComputeKernel attribute can only be used on ints! {field} is not of int type!");
+                    continue;
+                }
+
+                int kernel = computeShader.FindKernel(name);
+                namesToKernels.Add(name, kernel);
+                field.SetValue(this, kernel);
+            }
         }
     }
 }
